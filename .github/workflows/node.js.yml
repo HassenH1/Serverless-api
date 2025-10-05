@@ -5,11 +5,10 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -18,24 +17,25 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    
-    - name: Install Serverless Framework and other packages
-      run: npm install -g serverless
-      run: npm ci
-    
-    - name: Deploy to AWS (Dev)
-      if: github.ref == 'refs/heads/dev'
-      run: serverless deploy --stage dev
+      - uses: actions/checkout@v4
 
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
 
-    - name: Deploy to AWS (Prod)
-      if: github.ref == 'refs/heads/main'
-      run: npm ci
-      run: serverless deploy --stage prod
+      - name: Install Serverless Framework and other packages
+        run: |
+          npm install -g serverless
+          npm ci
+
+      - name: Deploy to AWS (Dev)
+        if: github.ref == 'refs/heads/dev'
+        run: serverless deploy --stage dev
+
+      - name: Deploy to AWS (Prod)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          npm ci
+          serverless deploy --stage prod
