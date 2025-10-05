@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: 22.x
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -28,7 +28,7 @@ jobs:
       - name: Install Serverless Framework and other packages
         run: |
           npm install -g serverless
-          npm ci
+          npm ci --if-present
 
       - name: Deploy to AWS (Dev)
         if: github.ref == 'refs/heads/dev'
