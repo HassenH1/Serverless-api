@@ -1,0 +1,55 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: hassenh1
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: my-app
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: FirstService
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  # Uncomment to easily set up a custom domain. Read the docs for more details:
+  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
+  # domain: api.example.com
+  httpApi:
+    cors: true
+
+functions:
+  getTodos:
+    handler: handler.getTodos
+    events:
+      - httpApi: # Here is api gateway v2
+          path: /todo
+          method: GET
+  createTodo:
+    handler: handler.createTodo
+    events:
+      - httpApi:
+          path: /todo
+          method: POST
+  updateTodo:
+    handler: handler.updateTodo
+    events:
+      - httpApi:
+          path: /todo/{id}
+          method: PATCH
+  deleteTodo:
+    handler: handler.deleteTodo
+    events:
+      - httpApi:
+          path: /todo/{id}
+          method: DELETE
+# resources:
+#   Resources:
+#     TodoDB:
+#       Type: AWS::DynamoDB::Table
+#       Properties:
+#         TableName: Todo
+#         AttributeDefinitions:
+#           - AttributeName: TodoID
+#             AttributeType: S
+#           - AttributeName: task
+#             AttributeType: S
+#         KeySchema:
+#           - AttributeName: TodoID
+#             KeyType: HASH
