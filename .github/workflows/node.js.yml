@@ -27,15 +27,15 @@ jobs:
         cache: 'npm'
     
     - name: Install Serverless Framework and other packages
-    - run: npm install -g serverless
-    - run: npm ci
+      run: npm install -g serverless
+      run: npm ci
     
     - name: Deploy to AWS (Dev)
       if: github.ref == 'refs/heads/dev'
-    - run: serverless deploy --stage dev
+      run: serverless deploy --stage dev
 
 
     - name: Deploy to AWS (Prod)
       if: github.ref == 'refs/heads/main'
-    - run: npm ci
-    - run: serverless deploy --stage prod
+      run: npm ci
+      run: serverless deploy --stage prod
