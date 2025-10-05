@@ -25,7 +25,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-      - name: Install Serverless Framework and other packages
+      - name: Install packages
         run: |
           npm install -g serverless
           npm ci --if-present
@@ -36,6 +36,4 @@ jobs:
 
       - name: Deploy to AWS (Prod)
         if: github.ref == 'refs/heads/main'
-        run: |
-          npm ci
-          serverless deploy --stage prod
+        run: serverless deploy --stage prod
