@@ -49,10 +49,6 @@ resources:
         AttributeDefinitions:
           - AttributeName: TodoID
             AttributeType: S
-          - AttributeName: timestamp
-            AttributeType: N
         KeySchema:
           - AttributeName: TodoID
             KeyType: HASH
-          - AttributeName: timestamp
-            KeyType: RANGE

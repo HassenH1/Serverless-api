@@ -7,7 +7,9 @@ import {
   UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
 import crypto from "crypto";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
 
+const TABLENAME = "TodoDB";
 const client = new DynamoDBClient({
   region: "us-east-1",
   credentials: {
@@ -18,13 +20,16 @@ const client = new DynamoDBClient({
 
 const getTodos = async () => {
   try {
-    const data = await client.send(new ScanCommand({ TableName: "TodoDB" }));
-    console.log("Data retrieved:", data);
+    const data = await client.send(new ScanCommand({ TableName: TABLENAME }));
+    const todos = data.Items ? data.Items.map((item) => unmarshall(item)) : [];
     return {
       statusCode: 200,
-      body: data.Items ? JSON.stringify(data.Items) : JSON.stringify([]),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ todos }),
     };
   } catch (error) {
+    console.error("Error:", error);
+
     return {
       statusCode: 500,
       body: JSON.stringify({
@@ -42,7 +47,7 @@ const createTodo = async (event) => {
   try {
     await client.send(
       new PutItemCommand({
-        TableName: "TodoDB",
+        TableName: TABLENAME,
         Item: {
           TodoID: { S: `${crypto.randomBytes(16).toString("hex")}` },
           timestamp: { N: `${Date.now()}` },
@@ -60,6 +65,7 @@ const createTodo = async (event) => {
     };
   } catch (error) {
     console.error("Error:", error);
+
     return {
       statusCode: 500,
       body: JSON.stringify({
@@ -79,20 +85,16 @@ const updateTodo = async (event) => {
   try {
     await client.send(
       new UpdateItemCommand({
-        TableName: "TodoDB",
-        Key: {
-          TodoID: { S: id },
-        },
-        UpdateExpression: "SET #task = :newTask, timestamp = :newTimestamp",
+        TableName: TABLENAME,
+        Key: { TodoID: { S: id } },
+        UpdateExpression: "SET #task = :newTask",
         ExpressionAttributeNames: {
           "#task": "task",
-          "#timestamp": "timestamp",
         },
         ExpressionAttributeValues: {
           ":newTask": { S: body.task },
-          ":newTimestamp": { N: `${Date.now()}` },
         },
-        // ReturnValues: "ALL_NEW",
+        ReturnValues: "ALL_NEW",
       })
     );
     return {
@@ -104,10 +106,11 @@ const updateTodo = async (event) => {
     };
   } catch (error) {
     console.error("Error:", error);
+
     return {
       statusCode: 500,
       body: JSON.stringify({
-        message: "Failed to create todo",
+        message: "Failed to update todo",
         error: error.message,
       }),
     };
@@ -121,10 +124,8 @@ const deleteTodo = async (event) => {
     const { id } = event.pathParameters;
     await client.send(
       new DeleteItemCommand({
-        TableName: "TodoDB",
-        Key: {
-          userId: { S: id },
-        },
+        TableName: TABLENAME,
+        Key: { todoID: { S: id } },
       })
     );
     return {
@@ -135,6 +136,8 @@ const deleteTodo = async (event) => {
       }),
     };
   } catch (error) {
+    console.error("Error:", error);
+
     return {
       statusCode: 500,
       body: JSON.stringify({
