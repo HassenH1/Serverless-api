@@ -16,25 +16,22 @@ const client = new DynamoDBClient({
   },
 });
 
-const getTodos = async (event) => {
-  const response = { statusCode: 200, body: { todo: [] } };
+const getTodos = async () => {
   try {
     const data = await client.send(new ScanCommand({ TableName: "TodoDB" }));
-    if (!data.items) return response;
-
-    response.body = { todo: JSON.stringify({ todos: data.items }) };
-
-    return response;
+    console.log("Data retrieved:", data);
+    return {
+      statusCode: 200,
+      body: data.Items ? JSON.stringify(data.Items) : JSON.stringify([]),
+    };
   } catch (error) {
-    console.error("Error:", error);
-
-    response.statusCode = 500;
-    response.body = JSON.stringify({
-      message: "Failed to get todos",
-      error: error.message,
-    });
-
-    return response;
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Failed to get todos",
+        error: error.message,
+      }),
+    };
   }
 };
 
