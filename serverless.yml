@@ -13,16 +13,17 @@ provider:
   # domain: api.example.com
   httpApi:
     cors: true
-  stages:
-    default:
-      params:
-        deployment_env: dev
-    prod:
-      params:
-        deployment_env: prod
-    dev:
-      params:
-        deployment_env: dev
+
+stages:
+  default:
+    params:
+      deployment_env: dev
+  prod:
+    params:
+      deployment_env: prod
+  dev:
+    params:
+      deployment_env: dev
 
 functions:
   getTodos:
@@ -54,7 +55,7 @@ resources:
     TodoDB:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${params.deployment_env}-TodoDB
+        TableName: ${params.deployment_env}TodoDB
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: TodoID
