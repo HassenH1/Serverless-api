@@ -39,17 +39,20 @@ functions:
       - httpApi:
           path: /todo/{id}
           method: DELETE
-# resources:
-#   Resources:
-#     TodoDB:
-#       Type: AWS::DynamoDB::Table
-#       Properties:
-#         TableName: Todo
-#         AttributeDefinitions:
-#           - AttributeName: TodoID
-#             AttributeType: S
-#           - AttributeName: task
-#             AttributeType: S
-#         KeySchema:
-#           - AttributeName: TodoID
-#             KeyType: HASH
+resources:
+  Resources:
+    TodoDB:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        BillingMode: PAY_PER_REQUEST
+        TableName: TodoDB
+        AttributeDefinitions:
+          - AttributeName: TodoID
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: N
+        KeySchema:
+          - AttributeName: TodoID
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
