@@ -54,7 +54,7 @@ resources:
     TodoDB:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${params.deployment_env}_TodoDB
+        TableName: ${params.deployment_env}-TodoDB
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: TodoID
