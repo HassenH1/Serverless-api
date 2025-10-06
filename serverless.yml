@@ -17,13 +17,13 @@ provider:
 stages:
   default:
     params:
-      deployment_env: dev
+      deploymentenv: dev
   prod:
     params:
-      deployment_env: prod
+      deploymentenv: prod
   dev:
     params:
-      deployment_env: dev
+      deploymentenv: dev
 
 functions:
   getTodos:
@@ -55,7 +55,7 @@ resources:
     TodoDB:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${params.deployment_env}TodoDB
+        TableName: ${params.deploymentenv}TodoDB
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: TodoID
