@@ -9,12 +9,24 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: us-west-1
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${param:deploymentenv}.TodoDB" # Replace with your table's ARN or * for all
   # Uncomment to easily set up a custom domain. Read the docs for more details:
   # https://www.serverless.com/framework/docs/providers/aws/guide/domains
   # domain: api.example.com
   httpApi:
     cors: true
-
 stages:
   default:
     params:
@@ -29,24 +41,32 @@ stages:
 functions:
   getTodos:
     handler: handler.getTodos
+    environment:
+      TODO_TABLE: ${param:deploymentenv}.TodoDB
     events:
       - httpApi: # Here is api gateway v2
           path: /todo
           method: GET
   createTodo:
     handler: handler.createTodo
+    environment:
+      TODO_TABLE: ${param:deploymentenv}.TodoDB
     events:
       - httpApi:
           path: /todo
           method: POST
   updateTodo:
     handler: handler.updateTodo
+    environment:
+      TODO_TABLE: ${param:deploymentenv}.TodoDB
     events:
       - httpApi:
           path: /todo/{id}
           method: PATCH
   deleteTodo:
     handler: handler.deleteTodo
+    environment:
+      TODO_TABLE: ${param:deploymentenv}.TodoDB
     events:
       - httpApi:
           path: /todo/{id}

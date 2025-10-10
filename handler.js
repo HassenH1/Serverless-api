@@ -1,4 +1,3 @@
-import "dotenv/config";
 import {
   DynamoDBClient,
   PutItemCommand,
@@ -8,15 +7,10 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import crypto from "crypto";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
+import "dotenv/config";
 
-const TABLENAME = "TodoDB";
-const client = new DynamoDBClient({
-  region: "us-east-1",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+const TABLENAME = process.env.TODO_TABLE;
+const client = new DynamoDBClient({ region: "us-west-1" });
 
 const getTodos = async () => {
   try {
@@ -41,9 +35,8 @@ const getTodos = async () => {
 };
 
 const createTodo = async (event) => {
-  if (!event.body) throw new Error("Missing event body");
-
   const body = JSON.parse(event.body);
+
   try {
     await client.send(
       new PutItemCommand({
@@ -76,11 +69,9 @@ const createTodo = async (event) => {
 };
 
 const updateTodo = async (event) => {
-  if (!event.pathParameters) throw new Error("Missing path parameters");
-  if (!event.body) throw new Error("Missing event body");
-
   const { id } = event.pathParameters;
   const body = JSON.parse(event.body);
+
   try {
     await client.send(
       new UpdateItemCommand({
@@ -117,14 +108,12 @@ const updateTodo = async (event) => {
 };
 
 const deleteTodo = async (event) => {
-  if (!event.pathParameters) throw new Error("Missing path parameters");
-
   try {
     const { id } = event.pathParameters;
     await client.send(
       new DeleteItemCommand({
         TableName: TABLENAME,
-        Key: { todoID: { S: id } },
+        Key: { TodoID: { S: id } },
       })
     );
     return {
